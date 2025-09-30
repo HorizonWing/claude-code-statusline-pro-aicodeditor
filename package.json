@@ -44,14 +44,15 @@
     "preset",
     "customizable"
   ],
-  "author": "wangnov",
+  "author": "horizonwing",
+  "email": "horizonwingtech@gmail.com",
   "license": "MIT",
   "engines": {
     "node": ">=18.0.0"
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/wangnov/claude-code-statusline-pro.git"
+    "url": "git+https://github.com/horizonwing/claude-code-statusline-pro-aicodeditor.git"
   },
   "files": [
     "dist/",
