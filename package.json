@@ -1,5 +1,5 @@
 {
-  "name": "claude-code-statusline-pro",
+  "name": "claude-code-statusline-pro-aicodeditor",
   "version": "2.3.6",
   "description": "Enhanced configurable statusline for Claude Code with preset system, TOML configuration, and cross-platform support",
   "type": "module",

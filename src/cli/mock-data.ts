@@ -88,7 +88,7 @@ export class MockDataGenerator {
       inputData: {
         hookEventName: 'Status',
         sessionId: 'basic_session_001',
-        model: { id: 'claude-sonnet-4', display_name: 'Claude Sonnet 4' },
+        model: { id: 'claude-sonnet-4-5-20250929', display_name: 'Claude Sonnet 4.5' },
         workspace: {
           current_dir: process.cwd(),
           project_dir: process.cwd(),
@@ -487,7 +487,7 @@ export class MockDataGenerator {
         hookEventName: 'Status',
         sessionId: `custom_session_${Date.now()}`,
         model: {
-          id: options.modelId || 'claude-sonnet-4',
+          id: options.modelId || 'claude-sonnet-4-5-20250929',
           display_name: options.modelId || 'Claude Sonnet 4',
         },
         workspace: {
@@ -765,7 +765,7 @@ export function generateThemeComparisonData(): Record<string, InputData> {
  */
 export function generateUsageMockData(
   costLevel: 'low' | 'medium' | 'high' | 'extreme',
-  modelId = 'claude-sonnet-4'
+  modelId = 'claude-sonnet-4-5-20250929'
 ): UsageData {
   const generator = new MockDataGenerator();
   const tokenUsageMap = {
@@ -797,7 +797,7 @@ type AllUsageData = {
 /**
  * 获取所有成本级别的Usage测试数据集合 | Get Usage test data for all cost levels
  */
-export function generateAllUsageMockData(modelId = 'claude-sonnet-4'): AllUsageData {
+export function generateAllUsageMockData(modelId = 'claude-sonnet-4-5-20250929'): AllUsageData {
   return {
     low_cost: generateUsageMockData('low', modelId),
     medium_cost: generateUsageMockData('medium', modelId),
