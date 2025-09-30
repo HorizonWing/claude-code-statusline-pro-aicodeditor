@@ -1,0 +1,133 @@
+# ====================================================================
+# AI Code Editor 用户信息配置
+# ====================================================================
+#
+# 用于显示 aicodeditor.com 的用户使用情况和账户信息
+#
+# 使用说明：
+# 1. 复制此文件到 ~/.claude/statusline-pro/components/aicodeditor.toml
+# 2. 在主配置文件中启用 multiline.enabled = true
+# 3. 设置环境变量：
+#    export ANTHROPIC_API_KEY="your-key"
+#    或 export ANTHROPIC_AUTH_TOKEN="your-token"
+# 4. 重启Claude Code，系统会自动检测并显示用户信息
+#
+# ====================================================================
+
+[meta]
+description = "AI Code Editor 用户信息显示"
+version = "1.0"
+
+[widgets]
+
+# ====================================================================
+# AI Code Editor 用户信息 Widget
+# ====================================================================
+
+[widgets.aicodeditor_usage]
+enabled = true           # 启用此Widget
+type = "api"            # API类型
+row = 1                 # 显示在第二行
+col = 0                 # 第一列
+nerd_icon = "\uf121"    # Code图标 (Nerd Font)
+emoji_icon = "💻"       # 电脑图标
+text_icon = "[ACE]"     # 文本图标
+
+# 模板：根据API返回的数据自定义显示格式
+# API返回：{ "success": true, "data": { "points": 19685, "expirationDate": "2025-10-31 19:27:17" } }
+# 🆕 时间差格式化 - 自动计算到期剩余时间
+# 格式说明：.DHm = 自动选择合适单位（天/小时/分钟）
+# - ≥1天: 显示天数和小时 (如 "5天3小时")
+# - <1天但≥1小时: 显示小时和分钟 (如 "3小时15分钟")
+# - <1小时: 显示分钟 (如 "45分钟")
+template = "积分: {points:,.0f} | 剩余: {expirationDate - now():.DHm}"
+
+# 自动检测：当设置了 ANTHROPIC_API_KEY 或 ANTHROPIC_AUTH_TOKEN 时启用
+[widgets.aicodeditor_usage.detection]
+env = "ANTHROPIC_API_KEY"
+# 如果只想检测 ANTHROPIC_AUTH_TOKEN，可以改为：
+# env = "ANTHROPIC_AUTH_TOKEN"
+
+# API 配置
+[widgets.aicodeditor_usage.api]
+base_url = "https://aicodeditor.com"
+endpoint = "/api/v1/usage"
+method = "POST"         # 使用 POST 方法
+timeout = 5000          # 5秒超时
+data_path = "$.data"    # 提取data字段，包含points和expirationDate
+
+# 请求头配置
+[widgets.aicodeditor_usage.api.headers]
+"Authorization" = "Bearer ${ANTHROPIC_API_KEY}"
+"Content-Type" = "application/json"
+
+# 如果需要同时支持两种Token，可以这样配置：
+# "Authorization" = "Bearer ${ANTHROPIC_AUTH_TOKEN}"
+
+# 如果API返回结果在嵌套字段中，可以使用 data_path 提取
+# 例如：data_path = "$.data" 或 "$.result.user"
+
+# ====================================================================
+# 可选：剩余天数 Widget
+# ====================================================================
+
+[widgets.aicodeditor_days_remaining]
+enabled = false          # 默认禁用，需要时启用
+type = "api"
+row = 1
+col = 1
+nerd_icon = "\uf073"
+emoji_icon = "⏰"
+text_icon = "[T]"
+# 🆕 时间差格式化 - 自动计算到期剩余天数
+template = "剩余: {expirationDate - now():.D}天"
+
+[widgets.aicodeditor_days_remaining.detection]
+env = "ANTHROPIC_API_KEY"
+
+[widgets.aicodeditor_days_remaining.api]
+base_url = "https://aicodeditor.com"
+endpoint = "/api/v1/usage"
+method = "POST"
+timeout = 5000
+data_path = "$.data"
+
+[widgets.aicodeditor_days_remaining.api.headers]
+"Authorization" = "Bearer ${ANTHROPIC_API_KEY}"
+"Content-Type" = "application/json"
+
+# ====================================================================
+# 模板语法说明
+# ====================================================================
+#
+# 1. 基本字段引用：{field_name}
+# 2. 嵌套字段：{user.name} 或 {data.usage.total}
+# 3. 数学表达式：{used / total * 100:.2f}
+# 4. 时间差：{expires_at - now():.D}天
+# 5. 美元符号转义：\\$
+# 6. 格式化：
+#    - {value:.2f}  保留2位小数
+#    - {value:.0f}  取整
+#    - {value:,.0f} 千分位分隔
+#
+# ====================================================================
+# 常见问题
+# ====================================================================
+#
+# Q: Widget不显示？
+# A: 检查以下几点：
+#    1. 主配置中 multiline.enabled = true
+#    2. 环境变量 ANTHROPIC_API_KEY 已设置
+#    3. API返回数据正常（检查终端日志）
+#    4. template中的字段名与API返回的JSON键匹配
+#
+# Q: 如何查看API返回的数据结构？
+# A: 可以先用 curl 命令测试：
+#    curl -X POST https://aicodeditor.com/api/v1/usage \
+#      -H "Authorization: Bearer YOUR_KEY" \
+#      -H "Content-Type: application/json"
+#
+# Q: 支持多个Token源吗？
+# A: 支持！可以创建多个Widget，每个检测不同的环境变量
+#
+# ====================================================================
