@@ -68,7 +68,7 @@ npm --version
   "statusLine": {
     "type": "command", 
     "command": "npx claude-code-statusline-pro-aicodeditor@latest"
-    // 或使用原版：npx claude-code-statusline-pro-aicodeditor@latest
+    // 或使用原版：npx claude-code-statusline-pro@latest
   }
 }
 ```
