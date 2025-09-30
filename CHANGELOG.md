@@ -4,6 +4,23 @@
 
 All notable changes to this project will be documented in this file. The project adheres to [Semantic Versioning](https://semver.org/).
 
+## [2.3.7] - 2025-09-30
+
+### ✨ 新增功能 | New Features
+
+#### 🤖 模型支持 | Model Support
+- **添加 Claude Sonnet 4.5 支持** | Add Claude Sonnet 4.5 support
+  - `claude-sonnet-4-5-20250929`: 200k 上下文窗口 | 200k context window
+  - `claude-sonnet-4-5-20250929[1m]`: 1m 上下文窗口 | 1m context window
+  - 短名称映射: `S4.5` 和 `S4.5[1m]` | Short name mapping: `S4.5` and `S4.5[1m]`
+  - 长名称映射: `Sonnet 4.5` 和 `Sonnet 4.5[1m]` | Long name mapping: `Sonnet 4.5` and `Sonnet 4.5[1m]`
+
+### 📝 配置更新 | Configuration Updates
+- 更新配置模板添加新模型支持 | Update config template with new model support
+- 更新测试数据使用最新模型 | Update test data to use latest model
+
+---
+
 ## [2.0.0] - 2025-08-15
 
 ### 🎉 正式版发布 | Official Release

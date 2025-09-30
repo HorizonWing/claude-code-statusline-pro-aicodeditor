@@ -1,9 +1,12 @@
-# Claude Code Statusline Pro
+# Claude Code Statusline Pro - AI Code Editor Edition
 
-[![npm version](https://badge.fury.io/js/claude-code-statusline-pro.svg)](https://badge.fury.io/js/claude-code-statusline-pro)
+[![npm version](https://badge.fury.io/js/claude-code-statusline-pro-aicodeditor.svg)](https://badge.fury.io/js/claude-code-statusline-pro-aicodeditor)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![Node.js](https://img.shields.io/badge/Node.js-18+-green.svg)](https://nodejs.org/)
-[![Platform](https://img.shields.io/badge/Platform-Windows%20%7C%20macOS%20%7C%20Linux-blue.svg)](https://github.com/wangnov/claude-code-statusline-pro)
+[![Platform](https://img.shields.io/badge/Platform-Windows%20%7C%20macOS%20%7C%20Linux-blue.svg)](https://github.com/horizonwing/claude-code-statusline-pro-aicodeditor)
+
+> 🔥 **基于 [claude-code-statusline-pro](https://github.com/wangnov/claude-code-statusline-pro) 修改**
+> 本项目在原版基础上进行了增强和定制，添加了最新 Claude 模型支持和个性化配置。
 
 [中文](#使用指南) | [English](#user-guide)
 
@@ -11,7 +14,14 @@
 
 # 使用指南
 
-**Claude Code 专业状态栏** - 为Claude Code量身定制的智能状态栏系统。
+**Claude Code 专业状态栏 - AI Code Editor 定制版** - 为 Claude Code 量身定制的智能状态栏系统。
+
+## 🆕 相比原版的改进
+
+- ✅ **最新模型支持**: 已添加 Claude Sonnet 4.5 (20250929) 支持，包括 200k 和 1m 版本
+- ✅ **持续更新**: 及时跟进 Claude 新模型发布
+- ✅ **个性化配置**: 根据个人使用习惯优化的默认配置
+- ✅ **完全兼容**: 保持与原版 100% 配置兼容
 
 ## ✨ 核心特性
 
@@ -57,7 +67,8 @@ npm --version
 {
   "statusLine": {
     "type": "command", 
-    "command": "npx claude-code-statusline-pro@latest"
+    "command": "npx claude-code-statusline-pro-aicodeditor@latest"
+    // 或使用原版：npx claude-code-statusline-pro-aicodeditor@latest
   }
 }
 ```
@@ -90,13 +101,13 @@ npm --version
 注：这些命令全部是写在settings.json中的，并不是在终端直接执行使用（直接执行会打印出预览结果）
 ```bash
 # 显示所有组件（推荐）
-npx claude-code-statusline-pro@latest --preset PMBTUS --theme powerline
+npx claude-code-statusline-pro-aicodeditor@latest --preset PMBTUS --theme powerline
 
 # 只显示模型、Token和使用量
-npx claude-code-statusline-pro@latest --preset MTU --theme classic
+npx claude-code-statusline-pro-aicodeditor@latest --preset MTU --theme classic
 
 # 只显示分支和Token信息
-npx claude-code-statusline-pro@latest --preset BT --theme capsule
+npx claude-code-statusline-pro-aicodeditor@latest --preset BT --theme capsule
 ```
 
 ## 🎨 三大主题系统
@@ -138,13 +149,13 @@ Classic主题支持三种图标模式，默认会根据终端能力自动选择�
 
 ```bash
 # 强制启用Nerd Font图标（需要安装字体，否则会显示乱码）
-npx claude-code-statusline-pro@latest --force-nerd-font
+npx claude-code-statusline-pro-aicodeditor@latest --force-nerd-font
 
 # 强制启用Emoji图标（需要终端确实支持Emoji，如MacOS，否则会显示乱码）
-npx claude-code-statusline-pro@latest --force-emoji  
+npx claude-code-statusline-pro-aicodeditor@latest --force-emoji  
 
 # 强制启用纯文本模式
-npx claude-code-statusline-pro@latest --force-text
+npx claude-code-statusline-pro-aicodeditor@latest --force-text
 ```
 
 ## 📊 Token计算准确性
@@ -217,12 +228,12 @@ cost = (inputTokens * inputPrice + outputTokens * outputPrice +
 **项目级配置** (优先级: 高)
 - 路径: `~/.claude/projects/{project-hash}/statusline-pro/config.toml`
 - 适用: 特定项目的个性化配置
-- 初始化: `npx claude-code-statusline-pro@latest config --init`
+- 初始化: `npx claude-code-statusline-pro-aicodeditor@latest config --init`
 
 **用户级配置** (优先级: 低)
 - 路径: `~/.claude/statusline-pro/config.toml`
 - 适用: 全局默认配置，适用于所有项目
-- 初始化: `npx claude-code-statusline-pro@latest config --init -g`
+- 初始化: `npx claude-code-statusline-pro-aicodeditor@latest config --init -g`
 
 #### ⚡ 智能终端检测和配置初始化
 
@@ -230,13 +241,13 @@ cost = (inputTokens * inputPrice + outputTokens * outputPrice +
 
 ```bash
 # 初始化项目级配置（推荐）
-npx claude-code-statusline-pro@latest config --init
+npx claude-code-statusline-pro-aicodeditor@latest config --init
 
 # 初始化全局配置
-npx claude-code-statusline-pro@latest config --init -g
+npx claude-code-statusline-pro-aicodeditor@latest config --init -g
 
 # 强制重新初始化（覆盖现有配置）
-npx claude-code-statusline-pro@latest config --init --force
+npx claude-code-statusline-pro-aicodeditor@latest config --init --force
 ```
 
 **智能检测功能：**
@@ -302,7 +313,7 @@ force_text = false          # 强制文本模式
 
 **Q: 状态栏完全不显示或显示错误**
 ```bash
-# 错误示例：status line command failed: npx claude-code-statusline-pro@latest
+# 错误示例：status line command failed: npx claude-code-statusline-pro-aicodeditor@latest
 # 解决方案：升级Claude Code到最新版本
 npm install -g @anthropic-ai/claude-code@latest
 ```
@@ -340,13 +351,13 @@ npm install -g @anthropic-ai/claude-code@latest
 **Q: 图标显示为方框或乱码**
 ```bash
 # 检查终端是否支持Nerd Font，强制使用Emoji模式
-npx claude-code-statusline-pro@latest --force-emoji
+npx claude-code-statusline-pro-aicodeditor@latest --force-emoji
 ```
 
 **Q: 颜色显示异常**
 ```bash
 # 检查终端颜色支持，可以禁用颜色
-npx claude-code-statusline-pro@latest --no-color
+npx claude-code-statusline-pro-aicodeditor@latest --no-color
 ```
 
 **Q: 状态栏不更新**
@@ -359,17 +370,27 @@ cat ~/.claude/settings.json
 
 ```bash
 # 测试基本功能
-echo '{"model":{"id":"claude-sonnet-4"}}' | npx claude-code-statusline-pro@latest
+echo '{"model":{"id":"claude-sonnet-4"}}' | npx claude-code-statusline-pro-aicodeditor@latest
 
 # 测试特定预设和主题
-echo '{"model":{"id":"claude-sonnet-4"}}' | npx claude-code-statusline-pro@latest --preset MT --theme classic
+echo '{"model":{"id":"claude-sonnet-4"}}' | npx claude-code-statusline-pro-aicodeditor@latest --preset MT --theme classic
 ```
 
 ---
 
 # User Guide
 
-**Claude Code Professional Status Bar** - Smart status bar system specifically designed for Claude Code.
+**Claude Code Professional Status Bar - AI Code Editor Edition** - Smart status bar system specifically designed for Claude Code.
+
+> 🔥 **Based on [claude-code-statusline-pro](https://github.com/wangnov/claude-code-statusline-pro)**
+> This project is enhanced and customized based on the original version, with the latest Claude model support and personalized configurations.
+
+## 🆕 Improvements Over Original
+
+- ✅ **Latest Model Support**: Added Claude Sonnet 4.5 (20250929) support, including 200k and 1m versions
+- ✅ **Continuous Updates**: Timely updates for new Claude model releases
+- ✅ **Personalized Configuration**: Optimized default configurations based on personal usage habits
+- ✅ **Fully Compatible**: Maintains 100% configuration compatibility with the original version
 
 ## ✨ Core Features
 
@@ -415,7 +436,7 @@ Simply add one line to your Claude Code configuration file, no pre-installation 
 {
   "statusLine": {
     "type": "command", 
-    "command": "npx claude-code-statusline-pro@latest"
+    "command": "npx claude-code-statusline-pro-aicodeditor@latest"
   }
 }
 ```
@@ -449,13 +470,13 @@ Note: These commands are all written in settings.json, not executed directly in 
 
 ```bash
 # Show all components (recommended)
-npx claude-code-statusline-pro@latest --preset PMBTUS --theme powerline
+npx claude-code-statusline-pro-aicodeditor@latest --preset PMBTUS --theme powerline
 
 # Show only model, tokens, and usage
-npx claude-code-statusline-pro@latest --preset MTU --theme classic
+npx claude-code-statusline-pro-aicodeditor@latest --preset MTU --theme classic
 
 # Show only branch and token information
-npx claude-code-statusline-pro@latest --preset BT --theme capsule
+npx claude-code-statusline-pro-aicodeditor@latest --preset BT --theme capsule
 ```
 
 ## 🎨 Three Theme System
@@ -497,13 +518,13 @@ If your terminal already supports certain icons (e.g., Nerd Font) but doesn't au
 
 ```bash
 # Force enable Nerd Font icons (requires font installation, otherwise will show garbled text)
-npx claude-code-statusline-pro@latest --force-nerd-font
+npx claude-code-statusline-pro-aicodeditor@latest --force-nerd-font
 
 # Force enable Emoji icons (terminal must actually support Emoji like macOS, otherwise will show garbled text)
-npx claude-code-statusline-pro@latest --force-emoji  
+npx claude-code-statusline-pro-aicodeditor@latest --force-emoji  
 
 # Force enable plain text mode
-npx claude-code-statusline-pro@latest --force-text
+npx claude-code-statusline-pro-aicodeditor@latest --force-text
 ```
 
 ## 📊 Token Calculation Accuracy
@@ -576,12 +597,12 @@ The status bar uses a two-level configuration system for flexible configuration 
 **Project-level Configuration** (Priority: High)
 - Path: `~/.claude/projects/{project-hash}/statusline-pro/config.toml`
 - Application: Personalized configuration for specific projects
-- Initialization: `npx claude-code-statusline-pro@latest config --init`
+- Initialization: `npx claude-code-statusline-pro-aicodeditor@latest config --init`
 
 **User-level Configuration** (Priority: Low)
 - Path: `~/.claude/statusline-pro/config.toml`
 - Application: Global default configuration for all projects
-- Initialization: `npx claude-code-statusline-pro@latest config --init -g`
+- Initialization: `npx claude-code-statusline-pro-aicodeditor@latest config --init -g`
 
 #### ⚡ Smart Terminal Detection and Configuration Initialization
 
@@ -589,13 +610,13 @@ When running initialization commands, the system automatically detects your term
 
 ```bash
 # Initialize project-level configuration (recommended)
-npx claude-code-statusline-pro@latest config --init
+npx claude-code-statusline-pro-aicodeditor@latest config --init
 
 # Initialize global configuration
-npx claude-code-statusline-pro@latest config --init -g
+npx claude-code-statusline-pro-aicodeditor@latest config --init -g
 
 # Force re-initialization (overwrite existing configuration)
-npx claude-code-statusline-pro@latest config --init --force
+npx claude-code-statusline-pro-aicodeditor@latest config --init --force
 ```
 
 **Smart Detection Features:**
@@ -661,7 +682,7 @@ Smart detection and automatic adaptation for different terminal environments:
 
 **Q: Status bar not displaying or showing errors**
 ```bash
-# Error example: status line command failed: npx claude-code-statusline-pro@latest
+# Error example: status line command failed: npx claude-code-statusline-pro-aicodeditor@latest
 # Solution: Upgrade Claude Code to the latest version
 npm install -g @anthropic-ai/claude-code@latest
 ```
@@ -699,13 +720,13 @@ npm install -g @anthropic-ai/claude-code@latest
 **Q: Icons display as squares or garbled text**
 ```bash
 # Check if terminal supports Nerd Font, force use Emoji mode
-npx claude-code-statusline-pro@latest --force-emoji
+npx claude-code-statusline-pro-aicodeditor@latest --force-emoji
 ```
 
 **Q: Color display issues**
 ```bash
 # Check terminal color support, can disable colors
-npx claude-code-statusline-pro@latest --no-color
+npx claude-code-statusline-pro-aicodeditor@latest --no-color
 ```
 
 **Q: Status bar not updating**
@@ -718,8 +739,42 @@ cat ~/.claude/settings.json
 
 ```bash
 # Test basic functionality
-echo '{"model":{"id":"claude-sonnet-4"}}' | npx claude-code-statusline-pro@latest
+echo '{"model":{"id":"claude-sonnet-4"}}' | npx claude-code-statusline-pro-aicodeditor@latest
 
 # Test specific preset and theme
-echo '{"model":{"id":"claude-sonnet-4"}}' | npx claude-code-statusline-pro@latest --preset MT --theme classic
+echo '{"model":{"id":"claude-sonnet-4"}}' | npx claude-code-statusline-pro-aicodeditor@latest --preset MT --theme classic
+```
+
+---
+
+## 🙏 致谢 | Acknowledgments
+
+本项目基于 [@wangnov](https://github.com/wangnov) 的优秀项目 [claude-code-statusline-pro](https://github.com/wangnov/claude-code-statusline-pro) 进行修改和增强。
+
+This project is based on and enhanced from the excellent work of [@wangnov](https://github.com/wangnov)'s [claude-code-statusline-pro](https://github.com/wangnov/claude-code-statusline-pro).
+
+### 主要修改 | Main Modifications
+
+- 添加 Claude Sonnet 4.5 (20250929) 模型支持（200k 和 1m 版本）
+- 更新默认模型配置
+- 个性化配置优化
+- 持续跟进最新 Claude 模型
+
+### 许可证 | License
+
+本项目遵循 MIT 许可证，与原项目保持一致。
+
+This project follows the MIT License, consistent with the original project.
+
+---
+
+## 📞 联系方式 | Contact
+
+- **原项目 Original Project**: [claude-code-statusline-pro](https://github.com/wangnov/claude-code-statusline-pro)
+- **本分支 This Fork**: [claude-code-statusline-pro-aicodeditor](https://github.com/horizonwing/claude-code-statusline-pro-aicodeditor)
+- **问题反馈 Issues**: [GitHub Issues](https://github.com/horizonwing/claude-code-statusline-pro-aicodeditor/issues)
+
+如果你喜欢这个项目，请给原作者 [@wangnov](https://github.com/wangnov) 和本项目一个 ⭐️ Star！
+
+If you like this project, please give both the original author [@wangnov](https://github.com/wangnov) and this project a ⭐️ Star!
 ```
