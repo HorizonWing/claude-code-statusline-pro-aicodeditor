@@ -48,7 +48,9 @@ export class ApiWidget extends BaseWidget {
 
       return rendered || null;
     } catch (error) {
-      console.warn(`API小组件请求失败:`, error);
+      // 静默失败，不显示错误信息 | Silent failure, no error display
+      // API 请求失败是正常情况（如网络问题、认证失败等）
+      // 不应该影响状态栏的其他部分显示
       return null; // 失败时不显示 | Don't display on failure
     }
   }

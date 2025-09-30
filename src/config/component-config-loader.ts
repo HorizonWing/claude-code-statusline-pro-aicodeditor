@@ -44,7 +44,7 @@ const ComponentMultilineConfigSchema = z.object({
         .optional(),
       detection: z
         .object({
-          env: z.string(),
+          env: z.union([z.string(), z.array(z.string())]), // 支持单个或数组
           contains: z.string().optional(),
           equals: z.string().optional(),
           pattern: z.string().optional(),
@@ -259,14 +259,27 @@ function processEnvironmentVariables(obj: any): any {
     // 1. 先处理转义的 \$，将其替换为占位符
     let result = obj.replace(/\\\$/g, DOLLAR_PLACEHOLDER);
 
-    // 2. 替换 ${VAR_NAME} 格式的环境变量
-    result = result.replace(/\$\{([^}]+)\}/g, (match, varName) => {
-      const value = process.env[varName];
-      if (value === undefined) {
-        console.warn(`环境变量未找到: ${varName}`);
-        return match; // 保持原始字符串
+    // 2. 替换 ${VAR_NAME} 或 ${VAR1:-${VAR2}:-${VAR3}} 格式的环境变量
+    // 支持 fallback 语法，依次尝试多个环境变量
+    result = result.replace(/\$\{([^}]+)\}/g, (match, expr) => {
+      // 移除嵌套的 ${}，提取变量名列表
+      const varNames = expr.split(':-').map((v: string) => v.replace(/\$\{|\}/g, '').trim());
+
+      // 依次尝试每个变量名
+      for (const varName of varNames) {
+        const value = process.env[varName];
+        if (value !== undefined) {
+          return value; // 找到第一个存在的变量，返回其值
+        }
       }
-      return value;
+
+      // 所有变量都不存在
+      if (varNames.length > 1) {
+        console.warn(`环境变量未找到（已尝试）: ${varNames.join(', ')}`);
+      } else {
+        console.warn(`环境变量未找到: ${varNames[0]}`);
+      }
+      return match; // 保持原始字符串
     });
 
     // 3. 将占位符替换回美元符号

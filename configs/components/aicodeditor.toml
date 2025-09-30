@@ -5,12 +5,24 @@
 # 用于显示 aicodeditor.com 的用户使用情况和账户信息
 #
 # 使用说明：
-# 1. 复制此文件到 ~/.claude/statusline-pro/components/aicodeditor.toml
+# 1. 复制此文件到 ~/.claude/statusline-pro/components/usage.toml
+#    （注意：文件名必须是 usage.toml，对应 usage 组件）
 # 2. 在主配置文件中启用 multiline.enabled = true
-# 3. 设置环境变量：
-#    export ANTHROPIC_API_KEY="your-key"
-#    或 export ANTHROPIC_AUTH_TOKEN="your-token"
-# 4. 重启Claude Code，系统会自动检测并显示用户信息
+# 3. 设置环境变量（二选一或同时设置）：
+#    - 在 ~/.claude/settings.json 中配置（推荐）：
+#      {
+#        "env": {
+#          "ANTHROPIC_API_KEY": "your-key"
+#          // 或 "ANTHROPIC_AUTH_TOKEN": "your-token"
+#        }
+#      }
+#    - 或在 shell 配置文件中导出：
+#      export ANTHROPIC_API_KEY="your-key"
+# 4. 重启 Claude Code，系统会自动检测并显示用户信息
+#
+# 🆕 多环境变量支持：
+# 系统会自动检测 ANTHROPIC_AUTH_TOKEN 或 ANTHROPIC_API_KEY
+# 只要设置了其中任意一个，用户信息就会显示
 #
 # ====================================================================
 
@@ -42,11 +54,11 @@ text_icon = "[ACE]"     # 文本图标
 # - <1小时: 显示分钟 (如 "45分钟")
 template = "积分: {points:,.0f} | 剩余: {expirationDate - now():.DHm}"
 
-# 自动检测：当设置了 ANTHROPIC_API_KEY 或 ANTHROPIC_AUTH_TOKEN 时启用
+# 自动检测：当设置了 ANTHROPIC_AUTH_TOKEN 或 ANTHROPIC_API_KEY 时启用
 [widgets.aicodeditor_usage.detection]
-env = "ANTHROPIC_API_KEY"
-# 如果只想检测 ANTHROPIC_AUTH_TOKEN，可以改为：
-# env = "ANTHROPIC_AUTH_TOKEN"
+env = ["ANTHROPIC_AUTH_TOKEN", "ANTHROPIC_API_KEY"]
+# 支持数组形式，只要任意一个环境变量存在即可启用（OR逻辑）
+# 也可以使用单个字符串：env = "ANTHROPIC_AUTH_TOKEN"
 
 # API 配置
 [widgets.aicodeditor_usage.api]
@@ -57,12 +69,11 @@ timeout = 5000          # 5秒超时
 data_path = "$.data"    # 提取data字段，包含points和expirationDate
 
 # 请求头配置
+# 🆕 支持多个环境变量 fallback
+# 系统会按顺序尝试：先用 ANTHROPIC_AUTH_TOKEN，如果不存在则使用 ANTHROPIC_API_KEY
 [widgets.aicodeditor_usage.api.headers]
-"Authorization" = "Bearer ${ANTHROPIC_API_KEY}"
+"Authorization" = "Bearer ${ANTHROPIC_AUTH_TOKEN:-${ANTHROPIC_API_KEY}}"
 "Content-Type" = "application/json"
-
-# 如果需要同时支持两种Token，可以这样配置：
-# "Authorization" = "Bearer ${ANTHROPIC_AUTH_TOKEN}"
 
 # 如果API返回结果在嵌套字段中，可以使用 data_path 提取
 # 例如：data_path = "$.data" 或 "$.result.user"
@@ -83,7 +94,7 @@ text_icon = "[T]"
 template = "剩余: {expirationDate - now():.D}天"
 
 [widgets.aicodeditor_days_remaining.detection]
-env = "ANTHROPIC_API_KEY"
+env = ["ANTHROPIC_AUTH_TOKEN", "ANTHROPIC_API_KEY"]
 
 [widgets.aicodeditor_days_remaining.api]
 base_url = "https://aicodeditor.com"
@@ -93,7 +104,7 @@ timeout = 5000
 data_path = "$.data"
 
 [widgets.aicodeditor_days_remaining.api.headers]
-"Authorization" = "Bearer ${ANTHROPIC_API_KEY}"
+"Authorization" = "Bearer ${ANTHROPIC_AUTH_TOKEN}"
 "Content-Type" = "application/json"
 
 # ====================================================================

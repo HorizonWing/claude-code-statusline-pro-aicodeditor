@@ -395,39 +395,56 @@ export abstract class BaseWidget {
 
   /**
    * 评估检测规则 | Evaluate detection rules
+   * 支持单个环境变量或数组（OR逻辑）| Supports single env or array (OR logic)
    */
   private evaluateDetection(detection: any): boolean {
     if (!detection || !detection.env) {
       return true; // 如果没有检测配置，默认启用
     }
 
-    const envValue = process.env[detection.env];
-    if (!envValue) {
-      return false; // 环境变量不存在，不启用
-    }
+    // 支持数组形式的环境变量（OR逻辑）| Support array of env vars (OR logic)
+    const envNames = Array.isArray(detection.env) ? detection.env : [detection.env];
 
-    // 精确匹配
-    if (detection.equals) {
-      return envValue === detection.equals;
-    }
-
-    // 包含匹配
-    if (detection.contains) {
-      return envValue.includes(detection.contains);
-    }
-
-    // 正则表达式匹配
-    if (detection.pattern) {
-      try {
-        const regex = new RegExp(detection.pattern);
-        return regex.test(envValue);
-      } catch (error) {
-        console.warn(`无效的正则表达式: ${detection.pattern}`, error);
-        return false;
+    // 尝试每个环境变量，只要有一个匹配就返回true | Try each env, return true if any matches
+    for (const envName of envNames) {
+      const envValue = process.env[envName];
+      if (!envValue) {
+        continue; // 该环境变量不存在，尝试下一个 | Env not exist, try next
       }
+
+      // 精确匹配
+      if (detection.equals) {
+        if (envValue === detection.equals) {
+          return true;
+        }
+        continue;
+      }
+
+      // 包含匹配
+      if (detection.contains) {
+        if (envValue.includes(detection.contains)) {
+          return true;
+        }
+        continue;
+      }
+
+      // 正则表达式匹配
+      if (detection.pattern) {
+        try {
+          const regex = new RegExp(detection.pattern);
+          if (regex.test(envValue)) {
+            return true;
+          }
+        } catch (error) {
+          console.warn(`无效的正则表达式: ${detection.pattern}`, error);
+        }
+        continue;
+      }
+
+      // 如果没有指定匹配方式，只要环境变量存在就启用 | If no match rule, enable if env exists
+      return true;
     }
 
-    // 如果没有指定匹配方式，默认启用
-    return true;
+    return false; // 所有环境变量都不满足条件 | None of the env vars match
   }
 }
