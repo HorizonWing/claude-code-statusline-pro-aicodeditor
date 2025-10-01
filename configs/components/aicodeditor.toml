@@ -52,7 +52,13 @@ text_icon = "[ACE]"     # 文本图标
 # - ≥1天: 显示天数和小时 (如 "5天3小时")
 # - <1天但≥1小时: 显示小时和分钟 (如 "3小时15分钟")
 # - <1小时: 显示分钟 (如 "45分钟")
-template = "积分: {points:,.0f} | 剩余: {expirationDate - now():.DHm}"
+#
+# 🎨 条件颜色格式化：
+# - 使用 {icon} 显示主图标（代码图标）
+# - 使用内嵌图标：💎 (钻石，代表积分) 和 ⏰ (闹钟，代表剩余时间)
+# - 积分数值 < 1000 显示红色，否则显示绿色 {points:color(< 1000, red, green)}
+# - 剩余天数时间差 < 7天(604800000ms) 显示红色，否则显示绿色
+template = "{icon} 💎 {points:color(< 1000, red, green)} | ⏰ {expirationDate - now():color(< 604800000, red, green):.DHm}"
 
 # 自动检测：当设置了 ANTHROPIC_AUTH_TOKEN 或 ANTHROPIC_API_KEY 时启用
 [widgets.aicodeditor_usage.detection]
@@ -116,10 +122,19 @@ data_path = "$.data"
 # 3. 数学表达式：{used / total * 100:.2f}
 # 4. 时间差：{expires_at - now():.D}天
 # 5. 美元符号转义：\\$
-# 6. 格式化：
+# 6. 数值格式化：
 #    - {value:.2f}  保留2位小数
 #    - {value:.0f}  取整
 #    - {value:,.0f} 千分位分隔
+# 7. 🆕 颜色格式化：
+#    - {white:文本}  静态颜色（白色文本）
+#    - {points:color(< 1000, red, green)}  条件颜色（积分<1000显示红色，否则绿色）
+#    - {value:color(< 100, red, green):.2f}  组合格式（条件颜色+数值格式化）
+#    支持的颜色: white, red, green, yellow, blue, magenta, cyan, black
+#               bright_red, bright_green, bright_white 等
+# 8. 🆕 图标占位符：
+#    - {icon}  显示 Widget 的主图标（根据终端能力自动选择 nerd_icon / emoji_icon / text_icon）
+#    - 也可以在模板中直接使用 Emoji：💎 ⏰ 📊 等
 #
 # ====================================================================
 # 常见问题

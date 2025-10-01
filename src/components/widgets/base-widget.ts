@@ -78,7 +78,9 @@ export abstract class BaseWidget {
       // 组合图标和内容 | Combine icon and content
       if (content) {
         const icon = this.selectIcon();
-        const final = icon ? `${icon} ${content}` : content;
+        // 如果内容中已包含 {icon} 占位符，则已在模板中处理，不再自动添加
+        const hasIconPlaceholder = this.config.template?.includes('{icon}');
+        const final = (!hasIconPlaceholder && icon) ? `${icon} ${content}` : content;
 
         return {
           success: true,
@@ -132,13 +134,44 @@ export abstract class BaseWidget {
     }
 
     try {
-      return template.replace(/{([^}]+)}/g, (_match, expr) => {
+      // 先处理 {icon} 占位符，替换为 Widget 的图标
+      let processed = template.replace(/{icon}/g, () => {
+        return this.selectIcon();
+      });
+
+      // 处理静态颜色文本 {colorName:text}
+      // 例如: {white:积分} 或 {green:剩余}
+      processed = processed.replace(/{(\w+):([^}:]+)}/g, (match, colorName, text) => {
+        // 检查是否是颜色名称（不是字段表达式）
+        if (this.isColorName(colorName)) {
+          return this.applyColor(text, colorName);
+        }
+        // 否则保留原样，让后续处理
+        return match;
+      });
+
+      // 再处理字段表达式 {field} 或 {field:format}
+      processed = processed.replace(/{([^}]+)}/g, (_match, expr) => {
         return this.evaluateExpression(expr.trim(), data);
       });
+
+      return processed;
     } catch (error) {
       console.warn('模板渲染失败:', error);
       return template;
     }
+  }
+
+  /**
+   * 检查是否是有效的颜色名称
+   */
+  private isColorName(name: string): boolean {
+    const validColors = [
+      'black', 'red', 'green', 'yellow', 'blue', 'magenta', 'cyan', 'white',
+      'bright_black', 'bright_red', 'bright_green', 'bright_yellow',
+      'bright_blue', 'bright_magenta', 'bright_cyan', 'bright_white',
+    ];
+    return validColors.includes(name);
   }
 
   /**
@@ -355,11 +388,43 @@ export abstract class BaseWidget {
 
   /**
    * 应用格式化 | Apply formatting
+   * 支持组合格式: color(condition, trueColor, falseColor):otherFormat
+   * 例如: color(< 1000, red, green):.0f 或 color(< 604800000, red, green):.DHm
    */
   private applyFormat(value: any, format: string): string {
     if (value == null) return '';
 
     try {
+      // === 新增：组合格式支持（颜色 + 其他格式）===
+      // 格式: color(condition, trueColor, falseColor):otherFormat
+      const combinedMatch = format.match(/^color\(([^,]+),\s*(\w+),\s*(\w+)\):(.+)$/);
+      if (combinedMatch) {
+        const [, condition, trueColor, falseColor, restFormat] = combinedMatch;
+        const meetsCondition = this.evaluateCondition(value, condition.trim());
+        const colorName = meetsCondition ? trueColor : falseColor;
+
+        // 先应用其他格式化
+        const formatted = this.applyFormat(value, restFormat);
+
+        // 再应用颜色
+        return this.applyColor(formatted, colorName);
+      }
+
+      // === 新增：单独条件颜色格式化 ===
+      // 格式: color(condition, trueColor, falseColor)
+      const colorMatch = format.match(/^color\(([^,]+),\s*(\w+),\s*(\w+)\)$/);
+      if (colorMatch) {
+        const [, condition, trueColor, falseColor] = colorMatch;
+        const meetsCondition = this.evaluateCondition(value, condition.trim());
+        const colorName = meetsCondition ? trueColor : falseColor;
+
+        // 数值格式化（千分位分隔）
+        const numValue = Number(value);
+        const formatted = !Number.isNaN(numValue) ? numValue.toLocaleString('en-US') : String(value);
+
+        return this.applyColor(formatted, colorName);
+      }
+
       // === 新增：时间差格式化 ===
       if (isTimeFormat(format)) {
         const numValue = Number(value);
@@ -391,6 +456,81 @@ export abstract class BaseWidget {
       console.warn(`格式化失败: ${format}`, error);
       return String(value);
     }
+  }
+
+  /**
+   * 评估条件 | Evaluate condition
+   * 支持: <, >, <=, >=, ==, !=
+   */
+  private evaluateCondition(value: any, condition: string): boolean {
+    const numValue = Number(value);
+    if (Number.isNaN(numValue)) return false;
+
+    // 匹配运算符和阈值
+    const match = condition.match(/^([<>!=]+)\s*(.+)$/);
+    if (!match) return false;
+
+    const [, operator, thresholdStr] = match;
+    const threshold = Number(thresholdStr);
+    if (Number.isNaN(threshold)) return false;
+
+    switch (operator.trim()) {
+      case '<':
+        return numValue < threshold;
+      case '>':
+        return numValue > threshold;
+      case '<=':
+        return numValue <= threshold;
+      case '>=':
+        return numValue >= threshold;
+      case '==':
+      case '=':
+        return numValue === threshold;
+      case '!=':
+        return numValue !== threshold;
+      default:
+        return false;
+    }
+  }
+
+  /**
+   * 应用颜色 | Apply color
+   */
+  private applyColor(text: string, colorName: string): string {
+    // 使用终端颜色系统
+    const colorCode = this.getColorCode(colorName);
+    if (!colorCode) return text;
+
+    const reset = '\x1b[0m';
+    return `${colorCode}${text}${reset}`;
+  }
+
+  /**
+   * 获取颜色代码 | Get color code
+   */
+  private getColorCode(colorName: string): string {
+    const colorMap: { [key: string]: string } = {
+      // 基础颜色
+      black: '\x1b[30m',
+      red: '\x1b[31m',
+      green: '\x1b[32m',
+      yellow: '\x1b[33m',
+      blue: '\x1b[34m',
+      magenta: '\x1b[35m',
+      cyan: '\x1b[36m',
+      white: '\x1b[37m',
+      // 亮色
+      bright_black: '\x1b[90m',
+      bright_red: '\x1b[91m',
+      bright_green: '\x1b[92m',
+      bright_yellow: '\x1b[93m',
+      bright_blue: '\x1b[94m',
+      bright_magenta: '\x1b[95m',
+      bright_cyan: '\x1b[96m',
+      bright_white: '\x1b[97m',
+    };
+
+    return colorMap[colorName] || '';
   }
 
   /**
