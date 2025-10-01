@@ -199,8 +199,48 @@ export class ApiWidget extends BaseWidget {
       return wrapped;
     }
 
-    // 如果已经是对象，直接返回 | If already an object, return directly
-    return extractedData;
+    // 如果已经是对象，处理特殊字段 | If already an object, process special fields
+    const result = { ...extractedData };
+
+    // 处理过期时间字段，计算剩余时间 | Process expiration date field
+    if (result.data && result.data.expirationDate) {
+      result.data.remainingTime = this.calculateRemainingTime(result.data.expirationDate);
+    }
+
+    return result;
+  }
+
+  /**
+   * 计算剩余时间 | Calculate remaining time
+   */
+  private calculateRemainingTime(expirationDate: string): string {
+    try {
+      const now = new Date();
+      const expiry = new Date(expirationDate);
+      const diffMs = expiry.getTime() - now.getTime();
+
+      if (diffMs <= 0) {
+        return 'Expired';
+      }
+
+      const diffSeconds = Math.floor(diffMs / 1000);
+      const diffMinutes = Math.floor(diffSeconds / 60);
+      const diffHours = Math.floor(diffMinutes / 60);
+      const diffDays = Math.floor(diffHours / 24);
+
+      if (diffDays > 0) {
+        return `${diffDays}D`;
+      } else if (diffHours > 0) {
+        return `${diffHours}H`;
+      } else if (diffMinutes > 0) {
+        return `${diffMinutes}M`;
+      } else {
+        return `${diffSeconds}S`;
+      }
+    } catch (error) {
+      // 如果解析失败，返回原始值 | If parsing fails, return original value
+      return expirationDate;
+    }
   }
 
   /**

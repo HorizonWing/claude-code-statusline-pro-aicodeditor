@@ -18,7 +18,7 @@ col = 0
 nerd_icon = "\uf121"
 emoji_icon = "💻"
 text_icon = "[ACE]"
-template = "积分: {data.points:,} | 过期: {data.expirationDate}"
+template = "积分: {data.points:,} | 剩余: {data.remainingTime}"
 
 [widgets.aicodeditor_status.detection]
 # 检测 Claude 相关的环境变量
