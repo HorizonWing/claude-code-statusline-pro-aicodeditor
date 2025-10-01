@@ -21,6 +21,11 @@ import { projectResolver } from '../utils/project-resolver.js';
 import { initializeI18n, t } from './i18n.js';
 import { formatCliMessage } from './message-icons.js';
 import { MockDataGenerator } from './mock-data.js';
+import { loadClaudeEnvVarsSync } from '../utils/settings-loader.js';
+
+// 在最早期加载 Claude settings.json 中的环境变量
+// Load environment variables from Claude settings.json at the very beginning
+loadClaudeEnvVarsSync();
 
 // 声明构建时注入的全局变量
 declare const __PACKAGE_VERSION__: string | undefined;

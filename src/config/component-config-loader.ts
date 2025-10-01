@@ -276,9 +276,9 @@ function processEnvironmentVariables(obj: any): any {
       if (value2 !== undefined) {
         return value2;
       }
-      // 都不存在，输出警告
-      console.warn(`环境变量未找到（已尝试）: ${var1.trim()}, ${var2.trim()}`);
-      return match; // 保持原始字符串
+      // 都不存在，静默返回空字符串（不输出警告，因为可能从settings.json加载）
+      // 让widget的detection机制来决定是否显示
+      return ''; // 返回空字符串而不是保持原始字符串
     });
 
     // 然后处理简单的 ${VAR_NAME} 或 ${VAR1:-VAR2} 格式
@@ -295,13 +295,9 @@ function processEnvironmentVariables(obj: any): any {
         }
       }
 
-      // 所有变量都不存在
-      if (parts.length > 1) {
-        console.warn(`环境变量未找到（已尝试）: ${parts.join(', ')}`);
-      } else {
-        console.warn(`环境变量未找到: ${parts[0]}`);
-      }
-      return match; // 保持原始字符串
+      // 所有变量都不存在，静默返回空字符串
+      // 不输出警告，因为环境变量可能从settings.json加载
+      return ''; // 返回空字符串
     });
 
     // 3. 将占位符替换回美元符号
