@@ -10,6 +10,7 @@
 
 import { createWidget } from '../components/widgets/widget-factory.js';
 import { loadAllComponentConfigs } from '../config/component-config-loader.js';
+import { getDefaultComponentConfig, mergeComponentConfig } from '../components/widgets/default-configs.js';
 import type {
   ComponentMultilineConfig,
   Config,
@@ -85,6 +86,23 @@ export class MultiLineRenderer {
 
       // 只加载启用的组件配置 | Load only enabled component configs
       const componentConfigs = await loadAllComponentConfigs(this.configBaseDir, enabledComponents);
+
+      // 为没有用户配置的组件添加默认配置 | Add default configs for components without user configs
+      for (const componentName of enabledComponents) {
+        if (!componentConfigs.has(componentName)) {
+          const defaultConfig = getDefaultComponentConfig(componentName);
+          if (defaultConfig) {
+            componentConfigs.set(componentName, defaultConfig);
+          }
+        } else {
+          // 合并用户配置和默认配置 | Merge user config with default config
+          const userConfig = componentConfigs.get(componentName);
+          const mergedConfig = mergeComponentConfig(componentName, userConfig);
+          if (mergedConfig) {
+            componentConfigs.set(componentName, mergedConfig);
+          }
+        }
+      }
 
       if (process.env.DEBUG_WIDGET) {
         console.error('[MultiLine] Enabled components:', enabledComponents);
