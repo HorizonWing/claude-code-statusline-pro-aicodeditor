@@ -7,6 +7,7 @@ import type { WidgetConfig } from '../../config/schema.js';
 import type { TerminalCapabilities } from '../../terminal/detector.js';
 import { ApiWidget } from './api-widget.js';
 import { BaseWidget } from './base-widget.js';
+import { InfoWidget } from './info-widget.js';
 import { StaticWidget } from './static-widget.js';
 
 /**
@@ -19,6 +20,9 @@ export function createWidget(config: WidgetConfig, capabilities: TerminalCapabil
 
     case 'api':
       return new ApiWidget(config, capabilities);
+
+    case 'info':
+      return new InfoWidget(config, capabilities);
 
     default:
       throw new Error(`不支持的小组件类型: ${config.type}`);
@@ -90,11 +94,11 @@ export function validateWidgetConfig(config: WidgetConfig): { valid: boolean; er
  * 获取支持的小组件类型 | Get supported widget types
  */
 export function getSupportedWidgetTypes(): string[] {
-  return ['static', 'api'];
+  return ['static', 'api', 'info'];
 }
 
 /**
  * 导出小组件类型 | Export widget types
  */
-export { BaseWidget, StaticWidget, ApiWidget };
+export { BaseWidget, StaticWidget, ApiWidget, InfoWidget };
 export type { WidgetConfig };

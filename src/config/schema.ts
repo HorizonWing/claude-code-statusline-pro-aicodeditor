@@ -548,7 +548,7 @@ const WidgetConfigSchema = z.object({
   /** 强制启用（优先级高于detection） | Force enable (higher priority than detection) */
   force: z.boolean().optional(),
   /** 小组件类型 | Widget type */
-  type: z.enum(['static', 'api']),
+  type: z.enum(['static', 'api', 'info']),
   /** 行位置 | Row position */
   row: z.number().min(1),
   /** 列位置 | Column position */

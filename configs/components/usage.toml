@@ -1,0 +1,50 @@
+# AI Code Editor 用户信息配置模板
+# 将此文件复制到 ~/.claude/statusline-pro/components/usage.toml
+
+[meta]
+description = "AI Code Editor 用户信息显示"
+version = "1.0"
+
+[widgets]
+
+# === 用户信息显示 ===
+# 当检测到 ANTHROPIC_AUTH_TOKEN 或 ANTHROPIC_API_KEY 时自动显示
+# 如果没有检测到这些环境变量，多行显示将自动隐藏
+[widgets.aicodeditor_status]
+enabled = true
+type = "api"
+row = 1
+col = 0
+nerd_icon = "\uf121"
+emoji_icon = "💻"
+text_icon = "[ACE]"
+template = "积分: {data.points:,} | 过期: {data.expirationDate}"
+
+[widgets.aicodeditor_status.detection]
+# 检测 Claude 相关的环境变量
+# 支持 ANTHROPIC_AUTH_TOKEN 或 ANTHROPIC_API_KEY
+env = ["ANTHROPIC_AUTH_TOKEN", "ANTHROPIC_API_KEY"]
+
+[widgets.aicodeditor_status.api]
+base_url = "https://aicodeditor.com"
+endpoint = "/api/v1/usage"
+method = "POST"
+timeout = 5000
+headers = { "Authorization" = "Bearer ${ANTHROPIC_AUTH_TOKEN:-${ANTHROPIC_API_KEY}}" }
+data_path = "$"
+
+# === 演示模式 Widget (可选) ===
+# 设置 DEMO_MODE=true 来显示模拟数据
+# [widgets.demo_usage]
+# enabled = true
+# type = "static"
+# row = 1
+# col = 0
+# nerd_icon = "\uf121"
+# emoji_icon = "💻"
+# text_icon = "[ACE]"
+# content = "积分: 100,000 | 剩余: 7D15h"
+#
+# [widgets.demo_usage.detection]
+# env = "DEMO_MODE"
+# equals = "true"

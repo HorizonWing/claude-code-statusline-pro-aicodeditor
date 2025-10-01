@@ -56,8 +56,19 @@ export class MultiLineRenderer {
    * 渲染多行内容 | Render multi-line content
    */
   async renderExtensionLines(context: RenderContext): Promise<MultiLineRenderResult> {
+    if (process.env.DEBUG_WIDGET) {
+      const fs = require('fs');
+      fs.appendFileSync('/tmp/debug.log', `[MultiLine] renderExtensionLines called\n`);
+      fs.appendFileSync('/tmp/debug.log', `[MultiLine] multilineConfig: ${JSON.stringify(this.multilineConfig)}\n`);
+      console.error('[MultiLine] renderExtensionLines called');
+      console.error('[MultiLine] multilineConfig:', this.multilineConfig);
+    }
+
     // 检查是否启用多行 | Check if multiline is enabled
     if (!this.multilineConfig.enabled) {
+      if (process.env.DEBUG_WIDGET) {
+        console.error('[MultiLine] Multiline disabled');
+      }
       return {
         success: true,
         lines: [],
@@ -74,6 +85,11 @@ export class MultiLineRenderer {
 
       // 只加载启用的组件配置 | Load only enabled component configs
       const componentConfigs = await loadAllComponentConfigs(this.configBaseDir, enabledComponents);
+
+      if (process.env.DEBUG_WIDGET) {
+        console.error('[MultiLine] Enabled components:', enabledComponents);
+        console.error('[MultiLine] Loaded configs:', Array.from(componentConfigs.keys()));
+      }
 
       // 统计信息 | Statistics
       let totalWidgets = 0;
@@ -94,6 +110,19 @@ export class MultiLineRenderer {
         totalWidgets += widgetResults.total;
         renderedWidgets += widgetResults.rendered;
         failedWidgets += widgetResults.failed;
+      }
+
+      // 如果没有任何widget被渲染，不显示多行 | If no widgets rendered, don't show multiline
+      if (renderedWidgets === 0) {
+        return {
+          success: true,
+          lines: [],
+          stats: {
+            totalWidgets,
+            renderedWidgets,
+            failedWidgets,
+          },
+        };
       }
 
       // 渲染网格为字符串 | Render grid to strings
@@ -139,6 +168,10 @@ export class MultiLineRenderer {
 
     for (const [widgetName, widgetConfig] of Object.entries(componentConfig.widgets)) {
       total++;
+
+      if (process.env.DEBUG_WIDGET) {
+        console.error(`[MultiLine] Creating widget: ${componentName}.${widgetName}`, widgetConfig);
+      }
 
       try {
         // 创建小组件 | Create widget

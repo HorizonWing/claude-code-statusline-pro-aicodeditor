@@ -182,8 +182,19 @@ program
         }
       }
 
+      const configSource = configLoader.getConfigSource();
+      const configBaseDir = path.dirname(configSource.path || '');
+
+      if (process.env.DEBUG_WIDGET) {
+        const fs = require('fs');
+        fs.appendFileSync('/tmp/debug.log', `[CLI] Config source: ${JSON.stringify(configSource)}\n`);
+        fs.appendFileSync('/tmp/debug.log', `[CLI] Config base dir: ${configBaseDir}\n`);
+        console.error('[CLI] Config source:', configSource);
+        console.error('[CLI] Config base dir:', configBaseDir);
+      }
+
       const generator = new StatuslineGenerator(config, {
-        configBaseDir: path.dirname(configLoader.getConfigSource().path || ''),
+        configBaseDir,
       });
 
       // Mock数据模式 - 用于测试和演示

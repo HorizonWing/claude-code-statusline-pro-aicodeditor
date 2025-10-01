@@ -24,7 +24,7 @@ const ComponentMultilineConfigSchema = z.object({
     z.object({
       enabled: z.boolean().default(true),
       force: z.boolean().optional(),
-      type: z.enum(['static', 'api']),
+      type: z.enum(['static', 'api', 'info']),
       row: z.number().min(1),
       col: z.number().min(0),
       nerd_icon: z.string(),
@@ -259,25 +259,47 @@ function processEnvironmentVariables(obj: any): any {
     // 1. 先处理转义的 \$，将其替换为占位符
     let result = obj.replace(/\\\$/g, DOLLAR_PLACEHOLDER);
 
-    // 2. 替换 ${VAR_NAME} 或 ${VAR1:-${VAR2}:-${VAR3}} 格式的环境变量
+    // 2. 替换 ${VAR_NAME} 或 ${VAR1:-${VAR2}} 格式的环境变量
     // 支持 fallback 语法，依次尝试多个环境变量
-    result = result.replace(/\$\{([^}]+)\}/g, (match, expr) => {
-      // 移除嵌套的 ${}，提取变量名列表
-      const varNames = expr.split(':-').map((v: string) => v.replace(/\$\{|\}/g, '').trim());
 
-      // 依次尝试每个变量名
-      for (const varName of varNames) {
+    // 特殊处理嵌套的 fallback 语法
+    // 首先处理形如 ${VAR1:-${VAR2}} 的模式
+    const nestedFallbackPattern = /\$\{([^:]+):-\$\{([^}]+)\}\}/g;
+    result = result.replace(nestedFallbackPattern, (match, var1, var2) => {
+      // 首先尝试 var1
+      const value1 = process.env[var1.trim()];
+      if (value1 !== undefined) {
+        return value1;
+      }
+      // 然后尝试 var2
+      const value2 = process.env[var2.trim()];
+      if (value2 !== undefined) {
+        return value2;
+      }
+      // 都不存在，输出警告
+      console.warn(`环境变量未找到（已尝试）: ${var1.trim()}, ${var2.trim()}`);
+      return match; // 保持原始字符串
+    });
+
+    // 然后处理简单的 ${VAR_NAME} 或 ${VAR1:-VAR2} 格式
+    result = result.replace(/\$\{([^}]+)\}/g, (match, expr) => {
+      // 处理 fallback 语法 VAR1:-VAR2（非嵌套）
+      const parts = expr.split(':-');
+
+      // 尝试每个变量
+      for (const part of parts) {
+        const varName = part.trim();
         const value = process.env[varName];
         if (value !== undefined) {
-          return value; // 找到第一个存在的变量，返回其值
+          return value;
         }
       }
 
       // 所有变量都不存在
-      if (varNames.length > 1) {
-        console.warn(`环境变量未找到（已尝试）: ${varNames.join(', ')}`);
+      if (parts.length > 1) {
+        console.warn(`环境变量未找到（已尝试）: ${parts.join(', ')}`);
       } else {
-        console.warn(`环境变量未找到: ${varNames[0]}`);
+        console.warn(`环境变量未找到: ${parts[0]}`);
       }
       return match; // 保持原始字符串
     });

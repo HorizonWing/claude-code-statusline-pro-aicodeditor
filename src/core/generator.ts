@@ -146,6 +146,10 @@ export class StatuslineGenerator {
       // 渲染扩展行 | Render extension lines
       const extensionResult = await this.multiLineRenderer.renderExtensionLines(context);
 
+      if (process.env.DEBUG_WIDGET) {
+        console.error('[Generator] Extension result:', JSON.stringify(extensionResult, null, 2));
+      }
+
       // 组合主行和扩展行 | Combine main line and extension lines
       const lines: string[] = [];
       if (mainLine) {

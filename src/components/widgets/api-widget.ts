@@ -51,6 +51,9 @@ export class ApiWidget extends BaseWidget {
       // 静默失败，不显示错误信息 | Silent failure, no error display
       // API 请求失败是正常情况（如网络问题、认证失败等）
       // 不应该影响状态栏的其他部分显示
+      if (process.env.DEBUG_WIDGET) {
+        console.debug('[ApiWidget] Render failed:', error);
+      }
       return null; // 失败时不显示 | Don't display on failure
     }
   }
@@ -122,7 +125,7 @@ export class ApiWidget extends BaseWidget {
   private buildRequestOptions(): RequestInit {
     const apiConfig = this.config.api!;
 
-    return {
+    const options: RequestInit = {
       method: apiConfig.method,
       headers: {
         'User-Agent': 'Claude-Code-Statusline/1.0',
@@ -131,6 +134,16 @@ export class ApiWidget extends BaseWidget {
       // 添加超时控制 | Add timeout control
       signal: AbortSignal.timeout(apiConfig.timeout),
     };
+
+    // 对于POST/PUT/PATCH请求，添加请求体
+    // For POST/PUT/PATCH requests, add request body
+    if (apiConfig.method && ['POST', 'PUT', 'PATCH'].includes(apiConfig.method.toUpperCase())) {
+      // 使用配置的body，如果没有则使用空对象
+      // Use configured body, or empty object if not provided
+      options.body = apiConfig.body ? JSON.stringify(apiConfig.body) : '{}';
+    }
+
+    return options;
   }
 
   /**
